@@ -50,19 +50,19 @@ main {
 /*table*/
 
 
- .shawarma {
+.shawarma {
     background: url("../img/shawarma.png") center/contain no-repeat;
     height: 40px;
     width: 60px;
 }
 
- .doshirak {
+.doshirak {
     background: url("../img/doshirak.png") center/contain no-repeat;
     height: 40px;
     width: 60px;
 }
 
- .bucks {
+.bucks {
     background: url("../img/bucks.png") center/contain no-repeat;
     height: 40px;
     width: 60px;

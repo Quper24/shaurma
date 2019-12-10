@@ -9,17 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
 	const ordersTable = document.getElementById('orders');
 	const modalOrder = document.getElementById('order_read');
 	const modalOrderActive = document.getElementById('order_active');
-	const orders = [];
+	const orders = JSON.parse(localStorage.getItem('orders')) || [];
 
 	const formCustomer = document.getElementById('form-customer');
 
+	const toStorage = () => {
+		localStorage.setItem('orders', JSON.stringify(orders));
+	};
 
 	const renderOrders = () => {
-		//ordersTable.innerHTML = '';
+		ordersTable.innerHTML = '';
 
 		orders.forEach((order, i) => {
 			ordersTable.innerHTML += `
-				<tr data-number-order="${i}">
+				<tr class="${order.active ? 'taken' : ''}" data-number-order="${i}">
 					<td>${i + 1}</td>
 					<td>${order.title}</td>
 					<td class="${order.currency}"></td>
@@ -28,18 +31,45 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	};
 
-	const handlerModal = (modal, order, event) => {
+	const handlerModal = event => {
 		const target = event.target;
-		if (target.closest('.close') || target === modal){
+		const modal = target.closest('.order-modal');
+		const order = orders[modal.id];
+
+		const baseAction = () => {
+			modal.style.display = 'none';
+			toStorage();
+			renderOrders();
+		};
+
+		if (target.closest('.close') || target === modal) {
 			modal.style.display = 'none';
 		}
 
+		if (target.classList.contains('get-order')) {
+			order.active = true;
+			baseAction();
+		}
+
+		if (target.id === 'capitulation') {
+			order.active = false;
+			baseAction();
+		}
+
+		if (target.id === 'ready') {
+			orders.splice(orders.indexOf(order), 1);
+			baseAction();
+		}
+
+
 	};
 
-	const openModal = (order, taken) => {
-		const {firstName, email, description, deadline, currency, amount, phone} = order;
-		const modal = taken ? modalOrderActive : modalOrder;
+	const openModal = numberOrder => {
+		const order = orders[numberOrder];
+		const { firstName, email, description, deadline, currency, amount, phone, active = false } = order;
+		const modal = active ? modalOrderActive : modalOrder;
 		modal.style.display = 'block';
+
 		const firstNameBlock = modal.querySelector('.firstName');
 		const emailBlock = modal.querySelector('.email');
 		const descriptionBlock = modal.querySelector('.description');
@@ -48,16 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const countBlock = modal.querySelector('.count');
 		const phoneBlock = modal.querySelector('.phone');
 
+		modal.id = numberOrder;
 		firstNameBlock.textContent = firstName;
 		emailBlock.textContent = email;
 		descriptionBlock.textContent = description;
 		deadlineBlock.textContent = deadline;
-		currencyBlock.className = '.currency_img';
+		currencyBlock.className = 'currency_img';
 		currencyBlock.classList.add(currency);
 		countBlock.textContent = amount;
 		phoneBlock ? phoneBlock.href = `tel:${phone}` : '';
 
-		modal.addEventListener('click', handlerModal.bind(null, modal, order));
+		modal.addEventListener('click', handlerModal);
 
 
 	};
@@ -67,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const obj = {};
 		for (const elem of formCustomer.elements) {
 			if (elem.tagName === 'TEXTAREA' ||
-				(elem.tagName === 'INPUT' && elem.type !== 'radio') ||
-				(elem.type === 'radio' && elem.checked)) {
+			(elem.tagName === 'INPUT' && elem.type !== 'radio') ||
+			(elem.type === 'radio' && elem.checked)) {
 
 				obj[elem.name] = elem.value;
 
@@ -78,8 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}
 		orders.push(obj);
-		console.log(orders)
-
+		toStorage();
 	});
 
 
@@ -109,9 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const targetOrder = target.closest('tr');
 
 		if (targetOrder) {
-			console.log(targetOrder.classList.contains('taken'));
-			openModal(orders[targetOrder.dataset.numberOrder], targetOrder.classList.contains('taken'));
-			console.log(orders[targetOrder.dataset.numberOrder])
+			openModal(targetOrder.dataset.numberOrder);
 		}
 
 	});
