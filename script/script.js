@@ -13,6 +13,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const formCustomer = document.getElementById('form-customer');
 
+
+	const renderOrders = () => {
+		//ordersTable.innerHTML = '';
+
+		orders.forEach((order, i) => {
+			ordersTable.innerHTML += `
+				<tr data-number-order="${i}">
+					<td>${i + 1}</td>
+					<td>${order.title}</td>
+					<td class="${order.currency}"></td>
+					<td>${order.deadline}</td>
+				</tr>`;
+		});
+	};
+
+	const handlerModal = (modal, order, event) => {
+		const target = event.target;
+		if (target.closest('.close') || target === modal){
+			modal.style.display = 'none';
+		}
+
+	};
+
+	const openModal = (order, taken) => {
+		const {firstName, email, description, deadline, currency, amount, phone} = order;
+		const modal = taken ? modalOrderActive : modalOrder;
+		modal.style.display = 'block';
+		const firstNameBlock = modal.querySelector('.firstName');
+		const emailBlock = modal.querySelector('.email');
+		const descriptionBlock = modal.querySelector('.description');
+		const deadlineBlock = modal.querySelector('.deadline');
+		const currencyBlock = modal.querySelector('.currency_img');
+		const countBlock = modal.querySelector('.count');
+		const phoneBlock = modal.querySelector('.phone');
+
+		firstNameBlock.textContent = firstName;
+		emailBlock.textContent = email;
+		descriptionBlock.textContent = description;
+		deadlineBlock.textContent = deadline;
+		currencyBlock.className = '.currency_img';
+		currencyBlock.classList.add(currency);
+		countBlock.textContent = amount;
+		phoneBlock ? phoneBlock.href = `tel:${phone}` : '';
+
+		modal.addEventListener('click', handlerModal.bind(null, modal, order));
+
+
+	};
+
 	formCustomer.addEventListener('submit', event => {
 		event.preventDefault();
 		const obj = {};
@@ -32,20 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log(orders)
 
 	});
-
-	const renderOrders = () => {
-		//ordersTable.innerHTML = '';
-
-		orders.forEach((order, i)=> {
-			ordersTable.innerHTML += `
-				<tr data-number-order="${i}">
-					<td>${i+1}</td>
-					<td>${order.title}</td>
-					<td class="${order.currency}"></td>
-					<td>${order.deadline}</td>
-				</tr>`;
-		});
-	};
 
 
 	customer.addEventListener('click', () => {
@@ -76,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (targetOrder) {
 			console.log(targetOrder.classList.contains('taken'));
 			openModal(orders[targetOrder.dataset.numberOrder], targetOrder.classList.contains('taken'));
+			console.log(orders[targetOrder.dataset.numberOrder])
 		}
 
 	});

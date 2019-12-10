@@ -50,19 +50,19 @@ main {
 /*table*/
 
 
-#orders .shawarma {
+ .shawarma {
     background: url("../img/shawarma.png") center/contain no-repeat;
     height: 40px;
     width: 60px;
 }
 
-#orders .doshirak {
+ .doshirak {
     background: url("../img/doshirak.png") center/contain no-repeat;
     height: 40px;
     width: 60px;
 }
 
-#orders .bucks {
+ .bucks {
     background: url("../img/bucks.png") center/contain no-repeat;
     height: 40px;
     width: 60px;
