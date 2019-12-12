@@ -18,6 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('orders', JSON.stringify(orders));
   };
 
+  const declOfNum = (number, titles) => number + ' ' + titles[(number % 100 > 4 && number % 100 < 20) ? 2 :
+    [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]];
+
+  const calcDeadline = data => {
+    const deadline = new Date(data); // дата, до которой считаем.
+    const today = Date.now(); // текущее время
+
+    const remaining = (deadline - today) / 1000 / 60 / 60;
+    //            миллисекунды / секунды / минуты / часы
+    if (remaining / 24 > 2) {
+      return declOfNum(Math.floor(remaining / 24), ['день', 'дня', 'дней']);
+    }
+    return declOfNum(Math.floor(remaining), ['час', 'часа', 'часов']);
+
+  };
+
   const renderOrders = () => {
     ordersTable.innerHTML = '';
 
@@ -27,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					<td>${i + 1}</td>
 					<td>${order.title}</td>
 					<td class="${order.currency}"></td>
-					<td>${order.deadline}</td>
+					<td>${calcDeadline(order.deadline)}</td>
 				</tr>`;
     });
   };
@@ -83,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     firstNameBlock.textContent = firstName;
     emailBlock.textContent = email;
     descriptionBlock.textContent = description;
-    deadlineBlock.textContent = deadline;
+    deadlineBlock.textContent = calcDeadline(deadline);
     currencyBlock.className = 'currency_img';
     currencyBlock.classList.add(currency);
     countBlock.textContent = amount;
@@ -99,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const obj = {};
     for (const elem of formCustomer.elements) {
       if (elem.tagName === 'TEXTAREA' ||
-      (elem.tagName === 'INPUT' && elem.type !== 'radio') ||
-      (elem.type === 'radio' && elem.checked)) {
+        (elem.tagName === 'INPUT' && elem.type !== 'radio') ||
+        (elem.type === 'radio' && elem.checked)) {
 
         obj[elem.name] = elem.value;
 
@@ -109,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+
     orders.push(obj);
     toStorage();
   });
