@@ -10,13 +10,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	const ordersTable = document.getElementById('orders');
 	const modalOrder = document.getElementById('order_read');
 	const modalOrderActive = document.getElementById('order_active');
+	const headTable = document.getElementById('headTable');
+
 	const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
 
 	const formCustomer = document.getElementById('form-customer');
 
 	const toStorage = () => {
 		localStorage.setItem('orders', JSON.stringify(orders));
 	};
+
+	function sortOrders(arr, property) {
+		arr.sort((a, b) => a[property] > b[property] ? 1 : -1);
+	}
+
+
 
 	const declOfNum = (number, titles) => number + ' ' + titles[(number % 100 > 4 && number % 100 < 20) ? 2 :
 		[2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]];
@@ -109,6 +118,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	};
+
+
+	headTable.addEventListener('click', (event) => {
+		const target = event.target;
+
+		if (target.classList.contains('head-sort')){
+			if (target.id === 'taskSort') {
+				sortOrders(orders, 'title');
+			}
+
+			if (target.id === 'currencySort') {
+				sortOrders(orders, 'currency');
+			}
+
+			if (target.id === 'deadlineSort') {
+				sortOrders(orders, 'deadline');
+			}
+
+			toStorage();
+			renderOrders();
+
+		}
+
+
+
+
+	});
 
 	formCustomer.addEventListener('submit', event => {
 		event.preventDefault();
